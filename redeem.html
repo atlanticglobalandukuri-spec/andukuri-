@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Redeem — Andukuri</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="redeem.css" />
+  <style>
+    #popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      color: #333;
+      padding: 20px 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      text-align: center;
+      font-family: sans-serif;
+      animation: fadeIn 0.3s ease;
+    }
+    #popup.success { border: 3px solid #4CAF50; }
+    #popup.error { border: 3px solid #F44336; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translate(-50%, -60%); }
+      to { opacity: 1; transform: translate(-50%, -50%); }
+    }
+  </style>
+</head>
+<body>
+  <img src="andukuri.png" alt="Andukuri Logo" width="150"/>
+  <h1>Redeem Your Rewards</h1>
+  <div id="userBox" class="card">
+    <div><strong>User:</strong> <span id="usernameDisplay">Not logged in</span></div>
+    <div><strong>Current Score:</strong> <span id="scoreDisplay">0</span></div>
+  </div>
+
+  <div class="card">
+    <h4>1500 score = 60 UC/100 Diamonds</h4>
+    <h3>Today's Redeem Count: <span id="todayCountDisplay">0</span></h3>
+  </div>
+  <p>-> The Indian gaming community is rapidly growing, with millions of players enjoying popular games like Free Fire and BGMI.</p><p>-> Mobile gaming is especially popular due to affordable smartphones and widespread internet access.</p><p>-> Many Indian gamers are young, tech-savvy individuals who see gaming as a fun way to relax and connect with friends.</p>
+  <p>-> Indian gamers have a strong sense of community and teamwork.</p><p>-> Players form squads, clans, and online groups to support each other.</p><p>-> Social media platforms like YouTube and Discord help gamers learn and connect. Content creators inspire new players and guide them with tips and awareness.</p><p>-> The community continues to grow, with more interest in esports, streaming, and gaming careers.</p>
+  <p>-> Despite growth, the Indian gaming community faces challenges.</p><p>-> Some players fall into scams or fake reward websites due to lack of awareness. There is also limited understanding of safe gaming practices. This shows the need for trustworthy platforms that offer legal and fair opportunities.</p><p>-> Educational gaming websites can guide players in the right direction and promote responsible gaming habits.</p>
+
+  <div class="card">
+    <input type="text" id="redeemMessage" placeholder="Enter Game ID (BGMI/FF-xxxxx)" maxlength="20" />
+    <button id="submitRedeem" class="btn primary">Submit Redeem</button>
+    <button id="backBtn" class="btn">Back to Home</button>
+  </div>
+
+  <div id="popup"></div>
+
+ <script src="redeem.js" type="module"></script>
+</body>
+</html>

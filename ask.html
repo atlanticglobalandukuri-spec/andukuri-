@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Ask — Andukuri</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="ask.css" />
+</head>
+<body>
+  <img src="andukuri.png" alt="Andukuri Logo" width="150"/>
+  <h1>Earn More Points</h1>
+  
+  <p>
+    -> The quiz on Andukuri is designed to be simple, fun, and easy for all users.<br>-> It includes questions from alphabets, basic mathematics, and Indian states and capitals. These topics are familiar to most users and help reduce fear or confusion.<br>-> The quiz is usually multiple-choice, allowing players to answer quickly and confidently. This system ensures that even beginners and young users can participate comfortably.<br>-> The quiz keeps users engaged while testing their basic knowledge in an enjoyable way.
+  </p>
+  
+  <div id="userBox" class="card">
+    <div><strong>User:</strong> <span id="usernameDisplay">Not logged in</span></div>
+    <div><strong>Current Score:</strong> <span id="scoreDisplay">0</span></div>
+  </div>
+  
+    <p>
+      -> Andukuri’s quiz balances learning and entertainment. Instead of feeling like an exam, the quiz feels like a game.<br>-> Every correct answer helps users move closer to earning rewards, which keeps them motivated.<br>-> This approach encourages users to improve their knowledge while having fun. Over time, players can develop better memory, faster thinking, and problem-solving skills.<br>-> The quiz makes learning useful and rewarding, helping users feel confident and interested in both education and gaming.
+    </p>
+    <p>
+      -> The quiz system is fair and transparent for all users. Everyone gets equal chances, and rewards depend only on performance, not money.<br>-> This removes pay-to-win pressure and promotes honest participation. The quiz topics also help users stay connected to Indian culture and education.<br>-> Overall, the quiz is not just about earning rewards but also about building knowledge and confidence.<br>-> It supports a healthy gaming environment where learning and fun work together.
+    </p>
+  <div class="card">
+    <button onclick="location.href='answers.html'" class="btn" id="answers">Answers</button>
+    <button id="askQuestionBtn" class="btn primary">Ask Question</button>
+    <button id="backBtn" class="btn">Back to Home</button>
+  </div>
+
+  <!-- ✅ Firebase v12 Modular SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+    import { getDatabase, ref, onValue, get } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
+
+    // ✅ Database 1 Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDfHKmjYt0djroQtfEIclJzh6YmUh3x_Uw",
+      authDomain: "profil-database.firebaseapp.com",
+      projectId: "profil-database",
+      storageBucket: "profil-database.appspot.com",
+      messagingSenderId: "700901273067",
+      appId: "1:700901273067:web:b011d12acb22bae245fdae",
+      measurementId: "G-BHFD1WMNKY",
+      databaseURL: "https://profil-database-default-rtdb.firebaseio.com/"
+    };
+
+    // ✅ Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // ✅ Elements
+    const usernameDisplay = document.getElementById("usernameDisplay");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+
+    // ✅ Check if user already stored in localStorage
+    const localUID = localStorage.getItem("uid");
+    const localEmail = localStorage.getItem("email");
+
+    if (localUID && localEmail) {
+      usernameDisplay.textContent = localEmail;
+
+      // Fetch latest score directly from database once
+      const scoreRef = ref(db, "users/" + localUID + "/score");
+      onValue(scoreRef, (snapshot) => {
+        const score = snapshot.exists() ? snapshot.val() : 0;
+        scoreDisplay.textContent = score;
+        localStorage.setItem("score", score);
+      });
+    } else {
+      usernameDisplay.textContent = "Not logged in";
+      scoreDisplay.textContent = "0";
+    }
+
+    // ✅ Navigation Buttons
+    document.getElementById("backBtn").addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+
+    // ✅ Question Data
+    const questions = [
+      { question: "2013 - 1637 = ?", options: ["376", "576", "386", "586"], correct: 0 },
+      { question: "35 ÷ 5 = ?", options: ["8", "6", "7", "5"], correct: 2 },
+      { question: "45 × 11 = ?", options: ["494", "495", "497", "496"], correct: 1 },
+      { question: "1637 + 389 = ?", options: ["2043", "2067", "2058", "2026"], correct: 3 },
+      { question: "34 + 36 ÷ 6 = ?", options: ["40", "70÷6", "70/6", "42"], correct: 0 },
+      { question: "310 × 9 = ?", options: ["2780", "2760", "2790", "2770"], correct: 2 },
+      { question: "563 × 0 + 1 = ?", options: ["0", "1", "564", "562"], correct: 1 },
+      { question: "1847 + 1845 - 1846 = ?", options: ["1847", "1848", "1845", "1846"], correct: 3 },
+      { question: "2095 ÷ 5 + 1 = ?", options: ["419", "420", "319", "418"], correct: 1 },
+      { question: "5173 + 219 - 1666 = ?", options: ["4786", "5729", "8277", "3726"], correct: 3 },
+      { question: "What is the capital of Andhra Pradesh?", options: ["Hyderabad", "Vishakhapatnam", "Amaravati", "Chennai"], correct: 2 },
+      { question: "What is the capital of Arunachal Pradesh?", options: ["Itanagar", "Guwahati", "Shillong", "Aizawl"], correct: 0 },
+      { question: "What is the capital of Assam?", options: ["Itanagar", "Guwahati", "Shillong", "Aizawl"], correct: 1 },
+      { question: "What is the capital of Bihar?", options: ["Raipur", "Bhopal", "Patna", "Ranchi"], correct: 2 },
+      { question: "What is the capital of Chhattisgarh?", options: ["Raipur", "Bhopal", "Patna", "Ranchi"], correct: 0 },
+      { question: "What is the capital of Goa?", options: ["Mumbai", "Raipur", "Panaji", "Imphal"], correct: 2 },
+      { question: "What is the capital of Gujarat?", options: ["Gandhinagar", "Mumbai", "Amaravati", "Patna"], correct: 0 },
+      { question: "What is the capital of Haryana?", options: ["Jaipur", "Chandigarh", "Lucknow", "Bhopal"], correct: 1 },
+      { question: "What is the capital of Himachal Pradesh?", options: ["Jaipur", "Chandigarh", "Dehradun", "Shimla"], correct: 3 },
+      { question: "What is the capital of Jharkhand?", options: ["Ranchi", "Patna", "Bhubaneswar", "Raipur"], correct: 0 },
+      { question: "What is the capital of Karnataka?", options: ["Hyderabad", "Chennai", "Bengaluru", "Mumbai"], correct: 2 },
+      { question: "What is the capital of Kerala?", options: ["Chennai", "Bengaluru", "Thiruvananthapuram", "Kochi"], correct: 2 },
+      { question: "What is the capital of Madhya Pradesh?", options: ["Bhopal", "Raipur", "Indore", "Gwalior"], correct: 0 },
+      { question: "What is the capital of Maharashtra?", options: ["Pune", "Mumbai", "Nagpur", "Nashik"], correct: 1 },
+      { question: "What is the capital of Manipur?", options: ["Imphal", "Shillong", "Aizawl", "Kohima"], correct: 0 },
+      { question: "What is the capital of Meghalaya?", options: ["Kohima", "Imphal", "Aizawl", "Shillong"], correct: 3 },
+      { question: "What is the capital of Mizoram?", options: ["Aizawl", "Imphal", "Shillong", "Kohima"], correct: 0 },
+      { question: "What is the capital of Nagaland?", options: ["Aizawl", "Imphal", "Shillong", "Kohima"], correct: 3 },
+      { question: "What is the capital of Odisha?", options: ["Patna", "Ranchi", "Bhubaneswar", "Raipur"], correct: 2 },
+      { question: "What is the capital of Punjab?", options: ["Amritsar", "Ludhiana", "Chandigarh", "Jalandhar"], correct: 2 },
+      { question: "What is the capital of Rajasthan?", options: ["Udaipur", "Jaipur", "Jodhpur", "Ajmer"], correct: 1 },
+      { question: "What is the capital of Sikkim?", options: ["Gangtok", "Thimphu", "Kathmandu", "Lhasa"], correct: 0 },
+      { question: "What is the capital of Tamil Nadu?", options: ["Tiruchirappalli", "Coimbatore", "Madurai", "Chennai"], correct: 3 },
+      { question: "What is the capital of Telangana?", options: ["Karimnagar", "Warangal", "Nizamabad", "Hyderabad"], correct: 3 },
+      { question: "What is the capital of Tripura?", options: ["Agartala", "Imphal", "Shillong", "Aizawl"], correct: 0 },
+      { question: "What is the capital of Uttar Pradesh?", options: ["Kanpur", "Lucknow", "Varanasi", "Agra"], correct: 1 },
+      { question: "What is the capital of Uttarakhand?", options: ["Haridwar", "Nainital", "Dehradun", "Rishikesh"], correct: 2 },
+      { question: "What is the capital of West Bengal?", options: ["Siliguri", "Darjeeling", "Kolkata", "Durgapur"], correct: 2 },
+      { question: "A, B, C, __, E", options: ["D", "F", "G", "H"], correct: 0 },
+      { question: "M, N, __, P", options: ["O", "Q", "R", "L"], correct: 0 },
+      { question: "F, G, H, __, J", options: ["I", "K", "L", "M"], correct: 0 },
+      { question: "A, C, E, __, I", options: ["F", "G", "H", "J"], correct: 1 },
+      { question: "Z, Y, __, W", options: ["V", "X", "U", "T"], correct: 1 },
+      { question: "B, D, F, __, J", options: ["G", "H", "I", "K"], correct: 1 },
+      { question: "C, F, I, __", options: ["J", "K", "L", "M"], correct: 2 },
+      { question: "A, D, G, __, M", options: ["H", "I", "J", "K"], correct: 2 },
+      { question: "P, O, N, __, L", options: ["K", "M", "J", "I"], correct: 1 },
+      { question: "A, Z, B, Y, __, X", options: ["C", "D", "W", "V"], correct: 0 }
+    ];
+
+    // ✅ Ask Question Button
+    document.getElementById("askQuestionBtn").addEventListener("click", () => {
+      const randomIndex = Math.floor(Math.random() * questions.length);
+      localStorage.setItem("questionIndex", randomIndex);
+      localStorage.setItem("questions", JSON.stringify(questions));
+      window.location.href = "question.html";
+    });
+  </script>
+</body>
+</html>

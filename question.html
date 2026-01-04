@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Question — Andukuri</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="question.css" />
+</head>
+<body>
+  <img src="andukuri.png" alt="Andukuri Logo" width="150"/>
+  <h1>Answer the Question</h1>
+
+  <div id="userBox" class="card">
+    <div><strong>User:</strong> <span id="usernameDisplay">Not logged in</span></div>
+    <div><strong>Current Score:</strong> <span id="scoreDisplay">0</span></div>
+  </div>
+  <p>-> Never let lack of money stop you from following your passion.</p><p>-> Every gamer has talent, and true skill grows with effort and learning.</p><p>-> Andukuri shows that knowledge is power and honesty brings rewards.</p><p>-> When you challenge yourself and stay consistent, success comes step by step. Keep learning, keep playing, and avoid shortcuts.</p><p>-> <b>Believe in yourself, stay focused, and grow stronger with every correct answer and every small achievement.</b></p>
+
+  <div class="card" id="questionBox">
+    <h2 id="questionText"></h2>
+    <div id="optionsContainer"></div>
+    <button id="backBtn" class="btn">Back</button>
+  </div>
+
+  <!-- ✅ Firebase v12 Modular SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+    import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
+
+    // ✅ Database 1 Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDfHKmjYt0djroQtfEIclJzh6YmUh3x_Uw",
+      authDomain: "profil-database.firebaseapp.com",
+      projectId: "profil-database",
+      storageBucket: "profil-database.appspot.com",
+      messagingSenderId: "700901273067",
+      appId: "1:700901273067:web:b011d12acb22bae245fdae",
+      measurementId: "G-BHFD1WMNKY",
+      databaseURL: "https://profil-database-default-rtdb.firebaseio.com"
+    };
+
+    // ✅ Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // ✅ Get user info from localStorage
+    let uid = localStorage.getItem("uid");
+    let email = localStorage.getItem("email");
+    let score = parseInt(localStorage.getItem("score")) || 0;
+
+    const usernameDisplay = document.getElementById("usernameDisplay");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+
+    usernameDisplay.textContent = email || "Not logged in";
+    scoreDisplay.textContent = score;
+
+    // ✅ Load the question
+    const questions = JSON.parse(localStorage.getItem("questions"));
+    const index = parseInt(localStorage.getItem("questionIndex")) || 0;
+    const q = questions[index];
+    document.getElementById("questionText").textContent = q.question;
+    const optionsContainer = document.getElementById("optionsContainer");
+
+    // ✅ Render answer options
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement("button");
+      btn.textContent = opt;
+      btn.className = "btn optionBtn";
+
+      btn.addEventListener("click", async () => {
+        // Disable all buttons after selecting
+        document.querySelectorAll(".optionBtn").forEach(b => b.disabled = true);
+
+        if (i === q.correct) {
+          btn.style.backgroundColor = "green";
+          score += 1;
+        } else {
+          btn.style.backgroundColor = "red";
+          document.querySelectorAll(".optionBtn")[q.correct].style.backgroundColor = "green";
+          score -= 5;
+          if (score < 0) score = 0;
+        }
+
+        // ✅ Update in Database 1 (profil-database)
+        if (uid) {
+          try {
+            await update(ref(db, "users/" + uid), { score: score });
+            scoreDisplay.textContent = score;
+            localStorage.setItem("score", score);
+
+            // ✅ Verify update by re-fetching the score
+            const snap = await get(ref(db, "users/" + uid + "/score"));
+            if (snap.exists()) {
+              console.log("Updated Score in DB:", snap.val());
+            }
+
+            // Delay before going back to ask.html
+            setTimeout(() => (window.location.href = "ask.html"), 1000);
+          } catch (err) {
+            alert("Error updating score: " + err.message);
+          }
+        } else {
+          alert("User not logged in — please log in again.");
+        }
+      });
+
+      optionsContainer.appendChild(btn);
+    });
+
+    // ✅ Back button
+    document.getElementById("backBtn").addEventListener("click", () => {
+      window.location.href = "ask.html";
+    });
+  </script>
+</body>
+</html>

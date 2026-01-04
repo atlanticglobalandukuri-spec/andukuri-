@@ -1,0 +1,75 @@
+/* General Page Styling */
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f4f6f8;
+  color: #222;
+  margin: 0;
+  padding: 20px;
+}
+
+/* Main Title */
+h1 {
+  text-align: center;
+  color: #1a237e;
+  margin-bottom: 30px;
+}
+
+/* Section Headings */
+h2 {
+  background-color: #e3f2fd;
+  color: #0d47a1;
+  padding: 10px 15px;
+  border-left: 6px solid #0d47a1;
+  margin-top: 40px;
+  border-radius: 4px;
+}
+
+/* Ordered Lists */
+ul {
+  background-color: #ffffff;
+  padding: 20px 40px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* List Items */
+li {
+  margin: 10px 0;
+  line-height: 1.6;
+}
+
+/* Highlight Answers */
+strong {
+  color: #2e7d32;
+  font-weight: bold;
+}
+
+/* Responsive for small screens */
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+
+  ul {
+    padding: 15px 25px;
+  }
+}
+
+.btn {
+  padding: 10px 15px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #0b74ff;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+img{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 25px;
+  width: 150px;
+}

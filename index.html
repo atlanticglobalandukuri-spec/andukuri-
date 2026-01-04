@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Home — Andukuri</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+  <img src="andukuri.png" alt="Andukuri Logo" width="150"/>
+  <h1>Home</h1>
+
+  <div id="userBox" class="card">
+    <div><strong>User:</strong> <span id="usernameDisplay">Not logged in</span></div>
+    <div><strong>Live Score:</strong> <span id="scoreDisplay">0</span></div>
+  </div>
+  <p>-> Andukuri is a gaming-support website created to help Indian gamers who enjoy playing Free Fire and BGMI but cannot afford to purchase diamonds or UC.</p><p>-> Many players, especially students, love gaming but do not have access to online payments or extra money. Andukuri was built to solve this problem in a simple and fair way.</p><p>-> Instead of spending money, users can earn rewards by using their basic knowledge. The platform focuses on helping gamers enjoy their favorite games without pressure while promoting learning and positive engagement.</p>
+  <p>-> The main goal of Andukuri is to combine education and gaming in a safe and responsible way.</p><p>-> The website does not encourage illegal activities, hacking, or unsafe shortcuts. Instead, it motivates users to learn and think while playing quizzes.</p><p>-> By answering simple questions, users can earn rewards honestly. Andukuri is designed to be easy to use, beginner-friendly, and suitable for young gamers.</p><p>-> It promotes fair play, learning, and responsible gaming while creating an enjoyable experience for the Indian gaming community.</p>
+
+  <div class="buttons">
+    <button id="signInBtn" class="btn">Sign In</button>
+    <button id="loginBtn" class="btn">Login</button>
+    <button id="redeemBtn" class="btn">Redeem</button>
+    <button id="earnMoreBtn" class="btn primary">Earn More</button>
+  </div>
+  <div class="klm">
+    <button onclick="location.href='aboutus.html'" class="btn" id="ve">About Us</button>
+    <button onclick="location.href='contactus.html'" class="btn" id="ve">Contact Us</button>
+    <button onclick="location.href='disclaimer.html'" class="btn" id="ve">Disclaimer</button>
+    <button onclick="location.href='pri.html'" class="btn" id="ve">Privacy Policy</button>
+    <button onclick="location.href='t&c.html'" class="btn" id="ve">Terms & Conditions</button>
+  </div>
+
+  <!-- ===================== FIREBASE v12 (MODULAR) ===================== -->
+  <script type="module">
+    // --- Import Firebase Functions ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-analytics.js";
+
+    // --- Firebase Config ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyDfHKmjYt0djroQtfEIclJzh6YmUh3x_Uw",
+      authDomain: "profil-database.firebaseapp.com",
+      projectId: "profil-database",
+      storageBucket: "profil-database.appspot.com", // ✅ fixed bucket
+      messagingSenderId: "700901273067",
+      appId: "1:700901273067:web:b011d12acb22bae245fdae",
+      measurementId: "G-BHFD1WMNKY",
+      databaseURL: "https://profil-database-default-rtdb.firebaseio.com"
+    };
+
+    // --- Initialize Firebase App ---
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const analytics = getAnalytics(app);
+
+    // --- DOM Elements ---
+    const usernameDisplay = document.getElementById("usernameDisplay");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+
+    // --- Auth State Check ---
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        usernameDisplay.innerText = user.email;
+
+        const userRef = ref(db, `users/${user.uid}`);
+
+        // ✅ Real-time listener for live score updates
+        onValue(userRef, async (snapshot) => {
+          if (snapshot.exists()) {
+            const data = snapshot.val();
+            const score = data.score || 0;
+            scoreDisplay.innerText = score;
+            localStorage.setItem("score", score);
+            localStorage.setItem("uid", user.uid);
+            localStorage.setItem("email", user.email);
+          } else {
+            // ✅ Create new record for first-time users
+            const defaultData = { email: user.email, score: 0 };
+            await set(userRef, defaultData);
+            scoreDisplay.innerText = "0";
+          }
+        });
+      } else {
+        usernameDisplay.innerText = "Not logged in";
+        scoreDisplay.innerText = "0";
+      }
+    });
+
+    // --- Navigation Buttons ---
+    document.getElementById("signInBtn").addEventListener("click", () => {
+      window.location.href = "signin.html";
+    });
+
+    document.getElementById("loginBtn").addEventListener("click", () => {
+      window.location.href = "login.html";
+    });
+
+    document.getElementById("redeemBtn").addEventListener("click", () => {
+      if (auth.currentUser) {
+        window.location.href = "redeem.html";
+      } else {
+        alert("Please login first to redeem points.");
+      }
+    });
+
+    document.getElementById("earnMoreBtn").addEventListener("click", () => {
+      if (auth.currentUser) {
+        window.location.href = "ask.html";
+      } else {
+        alert("Please login first to earn points.");
+      }
+    });
+  </script>
+</body>
+</html>

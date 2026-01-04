@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Login — Andukuri</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="login.css" />
+</head>
+<body>
+  <img src="andukuri.png" alt="Andukuri Logo" width="150"/>
+  <h1>Login</h1>
+  <p>-> Login security also protects users from hacking, identity theft, and misuse of accounts.</p><p>-> Features like password masking, session timeouts, and limited login attempts reduce security risks.</p><p>-> Users are advised not to share their login details with anyone and to log out after using shared devices.</p><p>-> By following proper security practices, websites build trust and ensure a safe, reliable, and responsible user experience for everyone.</p>
+  <div class="card">
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="password" id="password" placeholder="Password" required />
+    <button id="loginBtn" class="btn primary">Login</button>
+    <button id="backBtn" class="btn">Back</button>
+  </div>
+
+  <!-- ✅ Firebase v12 Modular Version -->
+  <script type="module">
+    // --- Import Firebase SDKs ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+    import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
+
+    // --- ✅ Firebase Config (Database 1) ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyDfHKmjYt0djroQtfEIclJzh6YmUh3x_Uw",
+      authDomain: "profil-database.firebaseapp.com",
+      projectId: "profil-database",
+      storageBucket: "profil-database.appspot.com", // fixed
+      messagingSenderId: "700901273067",
+      appId: "1:700901273067:web:b011d12acb22bae245fdae",
+      measurementId: "G-BHFD1WMNKY",
+      databaseURL: "https://profil-database-default-rtdb.firebaseio.com" // ✅ use .firebaseio.com, not .asia-southeast1
+    };
+
+    // --- ✅ Initialize Firebase ---
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // --- ✅ Login Function ---
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!email || !password) {
+        alert("Please enter both email and password.");
+        return;
+      }
+
+      try {
+        // Sign in user
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Read score from database
+        const dbRef = ref(db);
+        const snapshot = await get(child(dbRef, "users/" + user.uid + "/score"));
+        const score = snapshot.exists() ? snapshot.val() : 0;
+
+        // Save to localStorage
+        localStorage.setItem("uid", user.uid);
+        localStorage.setItem("email", user.email);
+        localStorage.setItem("score", score);
+
+        alert("Login successful!");
+        window.location.href = "index.html"; // redirect to homepage
+      } catch (error) {
+        alert("Error: " + error.message);
+      }
+    });
+
+    // --- ✅ Back Button ---
+    document.getElementById("backBtn").addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>

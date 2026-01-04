@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Sign In — Andukuri</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="signin.css" />
+</head>
+<body>
+  <img src="andukuri.png" alt="Andukuri Logo" width="150"/>
+  <h1>Sign In / Register</h1>
+  <p>-> Sign-in or login information security is very important for protecting users’ personal data and online accounts.</p><p>-> When users create an account, they provide details such as email addresses, usernames, and passwords. These details must be stored securely to prevent unauthorized access.</p><p>-> Strong passwords, encryption, and secure servers help keep login information safe.</p><p>-> Websites should never display or share passwords and should use secure login systems like HTTPS to protect data during transmission.</p>
+  <div class="card">
+    <!-- <h4>Email = "Your Name + @andukuri.com"</h4>-->
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="password" id="password" placeholder="Password (min 6 chars)" required />
+    <button id="signUpBtn" class="btn primary">Sign Up</button>
+    <button id="googleBtn" class="btn">Sign Up with Google</button>
+    <button id="backBtn" class="btn">Back</button>
+  </div>
+
+  <!-- ===================== FIREBASE v12 (MODULAR) ===================== -->
+  <script type="module">
+    // --- Import Firebase modules ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+    import { 
+      getAuth, 
+      createUserWithEmailAndPassword, 
+      GoogleAuthProvider, 
+      signInWithPopup 
+    } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+    import { 
+      getDatabase, 
+      ref, 
+      set, 
+      get 
+    } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-analytics.js";
+
+    // --- Firebase Config (Database 1) ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyDfHKmjYt0djroQtfEIclJzh6YmUh3x_Uw",
+      authDomain: "profil-database.firebaseapp.com",
+      projectId: "profil-database",
+      storageBucket: "profil-database.appspot.com", // ✅ fixed
+      messagingSenderId: "700901273067",
+      appId: "1:700901273067:web:b011d12acb22bae245fdae",
+      measurementId: "G-BHFD1WMNKY",
+      databaseURL: "https://profil-database-default-rtdb.firebaseio.com"
+    };
+
+    // --- Initialize Firebase ---
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const analytics = getAnalytics(app);
+
+    // --- Sign Up with Email/Password ---
+    document.getElementById("signUpBtn").addEventListener("click", async () => {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!email || !password) {
+        alert("Please enter both email and password.");
+        return;
+      }
+      if (password.length < 6) {
+        alert("Password must be at least 6 characters long.");
+        return;
+      }
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // ✅ Initialize user record in Realtime Database
+        await set(ref(db, "users/" + user.uid), {
+          email: email,
+          score: 0
+        });
+
+        alert("✅ Sign Up Successful!");
+        window.location.href = "index.html";
+      } catch (error) {
+        alert("❌ " + error.message);
+      }
+    });
+
+    // --- Google Sign-In ---
+    document.getElementById("googleBtn").addEventListener("click", async () => {
+      const provider = new GoogleAuthProvider();
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+
+        const userRef = ref(db, "users/" + user.uid);
+        const snapshot = await get(userRef);
+
+        // ✅ Create record if user doesn’t exist
+        if (!snapshot.exists()) {
+          await set(userRef, {
+            email: user.email,
+            score: 0
+          });
+        }
+
+        alert("✅ Signed in successfully with Google!");
+        window.location.href = "index.html";
+      } catch (error) {
+        alert("❌ " + error.message);
+      }
+    });
+
+    // --- Back Button ---
+    document.getElementById("backBtn").addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>
